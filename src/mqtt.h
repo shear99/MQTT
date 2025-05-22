@@ -67,6 +67,9 @@ void print_message_info(const ParsedTopic *topic_info, const ParsedMessage *msg_
 int messageArrived(void *context, char *topicName, int topicLen, MQTTClient_message *message);
 void connectionLost(void *context, char *cause);
 
+// publisher 관련 코드
+int pubMessageHandler(void *context, char *topicName, int topicLen, MQTTClient_message *message);
+
 // control/led.c
 void handle_led(const char *command);
 // control/buzzer.c

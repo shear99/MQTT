@@ -1,0 +1,4 @@
+status/raspberry_001/led/return
+status/raspberry_001/buzzer/return
+status/raspberry_001/s_segment/return
+status/raspberry_001/photoresistor/return

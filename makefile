@@ -13,7 +13,11 @@ OBJDIR = obj
 BINDIR = bin
 
 # 소스 파일들 (network, control 포함)
-SOURCES = $(SRCDIR)/main.c $(NETDIR)/topic_manager.c $(NETDIR)/sub_message_handler.c $(wildcard $(CTRLDIR)/*.c)
+SOURCES = $(SRCDIR)/main.c \
+	$(NETDIR)/topic_manager.c \
+	$(NETDIR)/sub_message_handler.c \
+	$(NETDIR)/pub_message_handler.c \
+	$(wildcard $(CTRLDIR)/*.c)
 OBJECTS = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SOURCES))
 TARGET = $(BINDIR)/mqtt
 
