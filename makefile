@@ -9,6 +9,7 @@ LDFLAGS = -lpaho-mqtt3cs -lcjson
 SRCDIR = src
 NETDIR = $(SRCDIR)/network
 CTRLDIR = $(SRCDIR)/control
+IPCDIR = $(SRCDIR)/IPC
 OBJDIR = obj
 BINDIR = bin
 
@@ -17,7 +18,8 @@ SOURCES = $(SRCDIR)/main.c \
 	$(NETDIR)/topic_manager.c \
 	$(NETDIR)/sub_message_handler.c \
 	$(NETDIR)/pub_message_handler.c \
-	$(wildcard $(CTRLDIR)/*.c)
+	$(wildcard $(CTRLDIR)/*.c) \
+	$(IPCDIR)/ipc_handler.c
 OBJECTS = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SOURCES))
 TARGET = $(BINDIR)/mqtt
 
@@ -46,6 +48,12 @@ $(OBJDIR)/network/%.o: $(NETDIR)/%.c $(HEADERS)
 # 오브젝트 파일 생성 (control/*.c)
 $(OBJDIR)/control/%.o: $(CTRLDIR)/%.c $(HEADERS)
 	@mkdir -p $(OBJDIR)/control
+	@echo "Compiling $<..."
+	@$(CC) $(CFLAGS) -c $< -o $@
+
+# 오브젝트 파일 생성 (IPC/*.c)
+$(OBJDIR)/IPC/%.o: $(IPCDIR)/%.c $(HEADERS)
+	@mkdir -p $(OBJDIR)/IPC
 	@echo "Compiling $<..."
 	@$(CC) $(CFLAGS) -c $< -o $@
 
