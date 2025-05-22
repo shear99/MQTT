@@ -6,17 +6,18 @@ CFLAGS = -Wall -Wextra -std=c99 -g -O2
 LDFLAGS = -lpaho-mqtt3cs -lcjson
 
 # 디렉터리 설정
-SRCDIR = .
+SRCDIR = src
+NETDIR = $(SRCDIR)/network
 OBJDIR = obj
 BINDIR = bin
 
-# 소스 파일들
-SOURCES = main.c topic_manager.c message_handler.c
+# 소스 파일들 (경로 반영)
+SOURCES = $(SRCDIR)/main.c $(NETDIR)/topic_manager.c $(NETDIR)/message_handler.c
 OBJECTS = $(SOURCES:%.c=$(OBJDIR)/%.o)
 TARGET = $(BINDIR)/mqtt_subscriber
 
-# 헤더 파일
-HEADERS = mqtt_subscriber.h
+# 헤더 파일 (경로 반영)
+HEADERS = $(NETDIR)/mqtt_subscriber.h
 
 # 기본 타겟
 all: directories $(TARGET)
@@ -26,16 +27,22 @@ directories:
 	@mkdir -p $(OBJDIR)
 	@mkdir -p $(BINDIR)
 
-# 실행 파일 생성
-$(TARGET): $(OBJECTS)
-	@echo "Linking $(TARGET)..."
-	@$(CC) $(OBJECTS) -o $@ $(LDFLAGS)
-	@echo "✓ Build completed successfully!"
-
-# 오브젝트 파일 생성
-$(OBJDIR)/%.o: $(SRCDIR)/%.c $(HEADERS)
+# 오브젝트 파일 생성 (main.c)
+$(OBJDIR)/main.o: $(SRCDIR)/main.c $(HEADERS)
 	@echo "Compiling $<..."
 	@$(CC) $(CFLAGS) -c $< -o $@
+
+# 오브젝트 파일 생성 (network/*.c)
+$(OBJDIR)/network/%.o: $(NETDIR)/%.c $(HEADERS)
+	@mkdir -p $(OBJDIR)/network
+	@echo "Compiling $<..."
+	@$(CC) $(CFLAGS) -c $< -o $@
+
+# 실행 파일 생성
+$(TARGET): $(OBJDIR)/main.o $(OBJDIR)/network/topic_manager.o $(OBJDIR)/network/message_handler.o
+	@echo "Linking $(TARGET)..."
+	@$(CC) $^ -o $@ $(LDFLAGS)
+	@echo "✓ Build completed successfully!"
 
 # 정리
 clean:
