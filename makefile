@@ -12,12 +12,12 @@ OBJDIR = obj
 BINDIR = bin
 
 # 소스 파일들 (경로 반영)
-SOURCES = $(SRCDIR)/main.c $(NETDIR)/topic_manager.c $(NETDIR)/message_handler.c
+SOURCES = $(SRCDIR)/main.c $(NETDIR)/topic_manager.c $(NETDIR)/sub_message_handler.c
 OBJECTS = $(SOURCES:%.c=$(OBJDIR)/%.o)
-TARGET = $(BINDIR)/mqtt_subscriber
+TARGET = $(BINDIR)/mqtt
 
 # 헤더 파일 (경로 반영)
-HEADERS = $(NETDIR)/mqtt_subscriber.h
+HEADERS = $(SRCDIR)/mqtt.h
 
 # 기본 타겟
 all: directories $(TARGET)
@@ -39,7 +39,7 @@ $(OBJDIR)/network/%.o: $(NETDIR)/%.c $(HEADERS)
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 # 실행 파일 생성
-$(TARGET): $(OBJDIR)/main.o $(OBJDIR)/network/topic_manager.o $(OBJDIR)/network/message_handler.o
+$(TARGET): $(OBJDIR)/main.o $(OBJDIR)/network/topic_manager.o $(OBJDIR)/network/sub_message_handler.o
 	@echo "Linking $(TARGET)..."
 	@$(CC) $^ -o $@ $(LDFLAGS)
 	@echo "✓ Build completed successfully!"
@@ -69,22 +69,22 @@ uninstall:
 # 실행
 run: $(TARGET)
 	@echo "Running MQTT Subscriber..."
-	@./$(TARGET)
+	@$(TARGET)
 
 # 실행 with custom config
 run-config: $(TARGET)
 	@echo "Running MQTT Subscriber with custom config..."
-	@./$(TARGET) $(CONFIG)
+	@$(TARGET) $(CONFIG)
 
 # 디버그 실행
 debug: $(TARGET)
 	@echo "Running with GDB..."
-	@gdb ./$(TARGET)
+	@gdb $(TARGET)
 
 # 메모리 체크
 memcheck: $(TARGET)
 	@echo "Running with Valgrind..."
-	@valgrind --tool=memcheck --leak-check=full ./$(TARGET)
+	@valgrind --tool=memcheck --leak-check=full $(TARGET)
 
 # 도움말
 help:

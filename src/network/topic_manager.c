@@ -1,4 +1,4 @@
-#include "mqtt_subscriber.h"
+#include "../mqtt.h"
 
 // 설정 파일에서 설정값 읽어오기
 int load_config_from_file(MQTTConfig *config, const char *filename) {

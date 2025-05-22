@@ -1,4 +1,4 @@
-#include "mqtt_subscriber.h"
+#include "../mqtt.h"
 
 // 토픽 계층 구조 파싱
 ParsedTopic parse_topic_hierarchy(const char *topic_name) {

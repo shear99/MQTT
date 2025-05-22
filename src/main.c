@@ -1,4 +1,4 @@
-#include "./network/mqtt_subscriber.h"
+#include "./mqtt.h"
 #include <signal.h>
 
 // 전역 변수 (시그널 핸들러에서 사용)

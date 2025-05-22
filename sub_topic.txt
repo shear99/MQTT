@@ -1,0 +1,4 @@
+control/raspberry_001/led/+
+control/raspberry_001/buzzer/+
+control/raspberry_001/s_segment/+
+control/raspberry_001/photoresistor/+
