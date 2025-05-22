@@ -19,12 +19,14 @@ ParsedTopic parse_topic_hierarchy(const char *topic_name) {
     }
     strcpy(topic_copy, topic_name);
     
-    // 토픽 hierarchy 파싱 (device_id/target_device/command)
-    char *device_id = strtok(topic_copy, "/");
+    // 4단계 토픽 파싱 (prefix/device_id/target_device/command)
+    char *prefix = strtok(topic_copy, "/");
+    char *device_id = strtok(NULL, "/");
     char *target_device = strtok(NULL, "/");
     char *command = strtok(NULL, "/");
     
-    if (device_id && target_device && command) {
+    if (prefix && device_id && target_device && command) {
+        strncpy(result.prefix, prefix, sizeof(result.prefix) - 1);
         strncpy(result.device_id, device_id, sizeof(result.device_id) - 1);
         strncpy(result.target_device, target_device, sizeof(result.target_device) - 1);
         strncpy(result.command, command, sizeof(result.command) - 1);
@@ -108,14 +110,15 @@ void print_message_info(const ParsedTopic *topic_info, const ParsedMessage *msg_
     printf("\n=== Message received ===\n");
     
     if (topic_info->is_valid) {
+        printf("Prefix: %s\n", topic_info->prefix);
         printf("Device ID: %s\n", topic_info->device_id);
         printf("Target Device: %s\n", topic_info->target_device);
         printf("Command: %s\n", topic_info->command);
-        printf("Processing: Control '%s' on device '%s' with command '%s'\n", 
-               topic_info->target_device, topic_info->device_id, topic_info->command);
+        printf("Processing: Control '%s' on device '%s' with command '%s' (prefix: %s)\n", 
+               topic_info->target_device, topic_info->device_id, topic_info->command, topic_info->prefix);
     } else {
-        printf("Warning: Topic does not follow expected format (device_id/target_device/command)\n");
-        printf("Expected format example: raspberry_001/led/on\n");
+        printf("Warning: Topic does not follow expected format (prefix/device_id/target_device/command)\n");
+        printf("Expected format example: control/raspberry_001/led/on\n");
     }
     
     if (msg_info->is_json) {
@@ -166,22 +169,28 @@ int messageArrived(void *context, char *topicName, int topicLen, MQTTClient_mess
     
     // 정보 출력
     print_message_info(&topic_info, &msg_info);
-    
-    // 여기에 실제 디바이스 제어 로직을 추가할 수 있음
+
+    // prefix에 따라 동작 분기
     if (topic_info.is_valid) {
-        // 예: LED 제어
-        if (strcmp(topic_info.target_device, "led") == 0) {
-            if (strcmp(topic_info.command, "on") == 0) {
-                printf("Action: LED ON command processed for device %s\n", topic_info.device_id);
-            } else if (strcmp(topic_info.command, "off") == 0) {
-                printf("Action: LED OFF command processed for device %s\n", topic_info.device_id);
+        if (strcmp(topic_info.prefix, "control") == 0) {
+            // 기존 subscriber 동작
+            // 예: LED 제어
+            if (strcmp(topic_info.target_device, "led") == 0) {
+                if (strcmp(topic_info.command, "on") == 0) {
+                    printf("Action: LED ON command processed for device %s\n", topic_info.device_id);
+                } else if (strcmp(topic_info.command, "off") == 0) {
+                    printf("Action: LED OFF command processed for device %s\n", topic_info.device_id);
+                }
             }
-        }
-        // 예: 센서 읽기
-        else if (strcmp(topic_info.target_device, "sensor") == 0) {
-            if (strcmp(topic_info.command, "read") == 0) {
-                printf("Action: Sensor read command processed for device %s\n", topic_info.device_id);
+            // 예: 센서 읽기
+            else if (strcmp(topic_info.target_device, "sensor") == 0) {
+                if (strcmp(topic_info.command, "read") == 0) {
+                    printf("Action: Sensor read command processed for device %s\n", topic_info.device_id);
+                }
             }
+        } else if (strcmp(topic_info.prefix, "status") == 0) {
+            // 향후 publisher 동작 구현 예정
+            printf("Info: 'status' prefix received. (Publisher logic can be implemented here)\n");
         }
     }
     

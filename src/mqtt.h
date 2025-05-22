@@ -36,6 +36,7 @@ typedef struct {
 
 // 파싱된 토픽 정보 구조체
 typedef struct {
+    char prefix[64];
     char device_id[64];
     char target_device[64];
     char command[64];
