@@ -67,6 +67,15 @@ void print_message_info(const ParsedTopic *topic_info, const ParsedMessage *msg_
 int messageArrived(void *context, char *topicName, int topicLen, MQTTClient_message *message);
 void connectionLost(void *context, char *cause);
 
+// control/led.c
+void handle_led(const char *command);
+// control/buzzer.c
+void handle_buzzer(const char *command);
+// control/s_segment.c
+void handle_s_segment(const char *command);
+// control/photoresistor.c
+void handle_photoresistor(const char *command);
+
 // 유틸리티 함수들
 void print_config(const MQTTConfig *config);
 void cleanup_resources(MQTTClient *client);

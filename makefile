@@ -8,12 +8,13 @@ LDFLAGS = -lpaho-mqtt3cs -lcjson
 # 디렉터리 설정
 SRCDIR = src
 NETDIR = $(SRCDIR)/network
+CTRLDIR = $(SRCDIR)/control
 OBJDIR = obj
 BINDIR = bin
 
-# 소스 파일들 (경로 반영)
-SOURCES = $(SRCDIR)/main.c $(NETDIR)/topic_manager.c $(NETDIR)/sub_message_handler.c
-OBJECTS = $(SOURCES:%.c=$(OBJDIR)/%.o)
+# 소스 파일들 (network, control 포함)
+SOURCES = $(SRCDIR)/main.c $(NETDIR)/topic_manager.c $(NETDIR)/sub_message_handler.c $(wildcard $(CTRLDIR)/*.c)
+OBJECTS = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SOURCES))
 TARGET = $(BINDIR)/mqtt
 
 # 헤더 파일 (경로 반영)
@@ -38,8 +39,14 @@ $(OBJDIR)/network/%.o: $(NETDIR)/%.c $(HEADERS)
 	@echo "Compiling $<..."
 	@$(CC) $(CFLAGS) -c $< -o $@
 
+# 오브젝트 파일 생성 (control/*.c)
+$(OBJDIR)/control/%.o: $(CTRLDIR)/%.c $(HEADERS)
+	@mkdir -p $(OBJDIR)/control
+	@echo "Compiling $<..."
+	@$(CC) $(CFLAGS) -c $< -o $@
+
 # 실행 파일 생성
-$(TARGET): $(OBJDIR)/main.o $(OBJDIR)/network/topic_manager.o $(OBJDIR)/network/sub_message_handler.o
+$(TARGET): $(OBJECTS)
 	@echo "Linking $(TARGET)..."
 	@$(CC) $^ -o $@ $(LDFLAGS)
 	@echo "✓ Build completed successfully!"

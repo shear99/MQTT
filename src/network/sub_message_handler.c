@@ -169,26 +169,24 @@ int messageArrived(void *context, char *topicName, int topicLen, MQTTClient_mess
     
     // 정보 출력
     print_message_info(&topic_info, &msg_info);
-
+    
     // prefix에 따라 동작 분기
     if (topic_info.is_valid) {
         if (strcmp(topic_info.prefix, "control") == 0) {
-            // 기존 subscriber 동작
-            // 예: LED 제어
+            // 각 제어 기기 파일의 함수를 호출하여 토픽의 4번째 필드(명령)를 출력
             if (strcmp(topic_info.target_device, "led") == 0) {
-                if (strcmp(topic_info.command, "on") == 0) {
-                    printf("Action: LED ON command processed for device %s\n", topic_info.device_id);
-                } else if (strcmp(topic_info.command, "off") == 0) {
-                    printf("Action: LED OFF command processed for device %s\n", topic_info.device_id);
-                }
+                handle_led(topic_info.command);
+            } else if (strcmp(topic_info.target_device, "buzzer") == 0) {
+                handle_buzzer(topic_info.command);
+            } else if (strcmp(topic_info.target_device, "s_segment") == 0) {
+                handle_s_segment(topic_info.command);
+            } else if (strcmp(topic_info.target_device, "photoresistor") == 0) {
+                handle_photoresistor(topic_info.command);
+            } else {
+                printf("Unknown control device: %s\n", topic_info.target_device);
             }
-            // 예: 센서 읽기
-            else if (strcmp(topic_info.target_device, "sensor") == 0) {
-                if (strcmp(topic_info.command, "read") == 0) {
-                    printf("Action: Sensor read command processed for device %s\n", topic_info.device_id);
-                }
-            }
-        } else if (strcmp(topic_info.prefix, "status") == 0) {
+        }
+        else if (strcmp(topic_info.prefix, "status") == 0) {
             // 향후 publisher 동작 구현 예정
             printf("Info: 'status' prefix received. (Publisher logic can be implemented here)\n");
         }
